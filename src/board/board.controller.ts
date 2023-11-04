@@ -13,7 +13,7 @@ import { CreateBoardDto } from "./dto/create-board.dto";
 import { UpdateBoardDto } from "./dto/update-board.dto";
 import { get } from "http";
 
-@Controller("board")
+@Controller("api/board")
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
