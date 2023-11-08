@@ -35,7 +35,9 @@ model Comment {
   dislike   Int @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
-  parentId  Int?
+  parentId  Int?     
+  parent    Comment? @relation("CommentToComment", fields: [parentId], references: [id]) 
+  children  Comment[] @relation("CommentToComment")
   postId    Int
   post      Post     @relation(fields: [postId], references: [id])
 }

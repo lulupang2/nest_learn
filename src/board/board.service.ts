@@ -1,14 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { CreateBoardDto } from "./dto/create-board.dto";
-import { UpdateBoardDto } from "./dto/update-board.dto";
+import { CreatePostDto, UpdatePostDto } from "./dto/post.dto";
 import { PrismaService } from "src/prisma/prisma.service";
-
+import { CreateCommentDto } from "./dto/comment.dto";
+import _ from "lodash";
 @Injectable()
 export class BoardService {
-  constructor(private prismaService: PrismaService) {}
-  create(createBoardDto: CreateBoardDto) {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createBoardDto: CreatePostDto) {
     const { title, content, author, password } = createBoardDto;
-    return this.prismaService.post.create({
+    return await this.prismaService.post.create({
       data: {
         title,
         content,
@@ -40,7 +41,7 @@ export class BoardService {
     return result;
   }
 
-  async findOne(id: number) {
+  async getPost(id: number) {
     const post = await this.prismaService.post.findUnique({
       where: { id },
     });
@@ -48,10 +49,83 @@ export class BoardService {
       where: { id },
       data: { views: { increment: 1 } },
     });
-    return post;
+    const comments = await this.getComments(id);
+
+    const commentSize = await this.prismaService.comment.count({
+      where: { postId: id },
+    });
+
+    // for (const comment of comments) {
+    //   if (comment.parentId) {
+    //     comment.children = await this.getCommentsByParentId(comment.id);
+    //   }
+    // }
+
+    return { post, comments, commentSize };
+  }
+  async createComment(createCommentDto: CreateCommentDto) {
+    const { author, content, password, postId, parentId } = createCommentDto;
+    const comment = await this.prismaService.comment.create({
+      data: {
+        author,
+        content,
+        password,
+        postId,
+        parentId: parentId ? parentId : null,
+      },
+    });
+
+    return comment;
   }
 
-  update(id: number, updateBoardDto: UpdateBoardDto) {
+  async getComments(postId: number, parentId: number | null = null) {
+    const comments = await this.prismaService.comment.findMany({
+      where: {
+        postId: postId,
+        parentId: parentId,
+      },
+      include: {
+        children: true,
+      },
+    });
+
+    for (const comment of comments) {
+      comment.children = await this.getComments(postId, comment.id);
+    }
+
+    return comments;
+  }
+
+  private async getCommentsByParentId(id: number) {
+    const comments = await this.prismaService.comment.findMany({
+      where: { parentId: Number(id) },
+      include: {
+        children: true,
+      },
+    });
+    for (const comment of comments) {
+      if (comment.children) {
+        comment.children = await this.getCommentsByParentId(comment.id);
+      }
+    }
+
+    return comments;
+  }
+
+  async getComment(id: number) {
+    return await this.prismaService.comment.findMany({
+      where: {
+        postId: {
+          equals: id,
+        },
+      },
+      include: {
+        parent: true,
+      },
+    });
+  }
+
+  update(id: number, updateBoardDto: UpdatePostDto) {
     return `This action updates a #${id} board`;
   }
 
@@ -59,19 +133,3 @@ export class BoardService {
     return `This action removes a #${id} board`;
   }
 }
-// 50개
-// 5개씩
-// 10페이지
-// 1번째 페이지 46~50
-// 2번째 페이지 41~45
-// 3번째 페이지 36~40
-// 4번째 페이지 31~35
-// 5번째 페이지 26~30
-// 6번째 페이지 21~25
-// 7번째 페이지 16~20
-// 8번째 페이지 11~15
-// 9번째 페이지 6~10
-// 10번째 페이지 1~5
-// total 50
-// limit 5
-// 50/5 = 10

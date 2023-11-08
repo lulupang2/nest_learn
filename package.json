@@ -18,12 +18,14 @@
     "@nestjs/platform-express": "^10.2.7",
     "@nestjs/swagger": "^7.1.14",
     "@prisma/client": "^5.5.2",
+    "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.1.18",
     "@types/node": "^20.8.6",
+    "class-validator": "^0.14.0",
     "prisma": "^5.5.2",
     "typescript": "^5.2.2"
   },
