@@ -1,6 +1,7 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { urlencoded, json } from "body-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,7 +13,10 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document);
+  SwaggerModule.setup("docs", app, document);
+  app.setGlobalPrefix("api");
+  app.use(json({ limit: "15mb" }));
+  app.use(urlencoded({ extended: true, limit: "50mb" }));
 
   await app.listen(9999);
 }

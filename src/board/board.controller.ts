@@ -12,7 +12,7 @@ import { BoardService } from "./board.service";
 import { CreatePostDto, UpdatePostDto } from "./dto/post.dto";
 import { CreateCommentDto } from "./dto/comment.dto";
 
-@Controller("api/board")
+@Controller("board")
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
@@ -22,8 +22,11 @@ export class BoardController {
   }
 
   @Get()
-  getPostLists(@Query("pageNum") pageNum: number) {
-    return this.boardService.findAll(pageNum);
+  getPostLists(
+    @Query("pageNum") pageNum: number,
+    @Query("limit") limit: number
+  ) {
+    return this.boardService.getList(pageNum, limit);
   }
 
   @Get(":id")
@@ -37,8 +40,8 @@ export class BoardController {
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.boardService.remove(+id);
+  remove(@Body("password") password: string, @Param("id") id: number) {
+    return this.boardService.deletePost(+id, password);
   }
 
   @Get(":id/comment")
