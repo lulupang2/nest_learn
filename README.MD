@@ -2,10 +2,12 @@
 
 ## 폴더 구조
 
-. ├── src
+```
+  ├── src
 │ ├── components
 │ └── utils
 ├── public
 ├── tests
 ├── README.md
 └── .gitignore
+```
