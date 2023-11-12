@@ -41,15 +41,20 @@ export class BoardService {
           createdAt: true,
           views: true,
           published: true,
+          comments: true,
         },
         // where: { published: true }, //비밀글처리 할지 아예 안보이게 할지 고민
         orderBy: { id: "desc" },
       });
+
       const postLength = await this.prismaService.post.count({
         // where: { published: true },
       });
       const result = {
-        item,
+        item: item.map((post) => ({
+          ...post,
+          commentCount: post.comments.length,
+        })),
         totalPage: Math.ceil(postLength / 5),
         totalPost: postLength,
         pageNum: Number(pageNum),
@@ -98,7 +103,7 @@ export class BoardService {
         author,
         content,
         password,
-        postId,
+        postId: Number(postId),
         parentId: parentId ? parentId : null,
       },
     });
