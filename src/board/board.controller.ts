@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from "@nestjs/common";
 import { BoardService } from "./board.service";
 import { CreatePostDto, UpdatePostDto } from "./dto/post.dto";
@@ -40,7 +41,13 @@ export class BoardController {
   }
 
   @Delete(":id")
-  remove(@Body("password") password: string, @Param("id") id: number) {
+  deletePost(
+    @Param("id") id: number,
+    @Body("password") password: string,
+    @Req() request: Request
+  ) {
+    console.log(request);
+
     return this.boardService.deletePost(+id, password);
   }
 

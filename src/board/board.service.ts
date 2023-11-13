@@ -43,7 +43,7 @@ export class BoardService {
           published: true,
           comments: true,
         },
-        // where: { published: true }, //비밀글처리 할지 아예 안보이게 할지 고민
+        where: { published: true }, //비밀글처리 할지 아예 안보이게 할지 고민
         orderBy: { id: "desc" },
       });
 
@@ -162,18 +162,21 @@ export class BoardService {
     return `This action updates a #${id} board`;
   }
 
-  async deletePost(id: number, password: string) {
+  async deletePost(id: number, password: any) {
+    console.log(id, password);
+
     const post = await this.prismaService.post.findUnique({
       where: { id },
     });
-    if (!post || post.password !== password) {
+    if (!post || post!.password !== password) {
       throw new HttpException(
         "비밀번호가 일치하지 않습니다.",
         HttpStatus.UNAUTHORIZED
       );
     } else {
-      return this.prismaService.post.delete({
+      return this.prismaService.post.update({
         where: { id },
+        data: { published: false },
       });
     }
   }
