@@ -24,12 +24,16 @@ export class BoardController {
 
   @Get()
   getPostLists(
-    @Query("pageNum") pageNum: number,
-    @Query("limit") limit: number
+    @Query()
+    query: {
+      pageNum: number;
+      search: string;
+      type: string;
+      lastId: number;
+    }
   ) {
-    return this.boardService.getList(pageNum, limit);
+    return this.boardService.getList(query);
   }
-
   @Get(":id")
   getPost(@Param("id") id: string) {
     return this.boardService.getPost(+id);
@@ -41,13 +45,7 @@ export class BoardController {
   }
 
   @Delete(":id")
-  deletePost(
-    @Param("id") id: number,
-    @Body("password") password: string,
-    @Req() request: Request
-  ) {
-    console.log(request);
-
+  deletePost(@Param("id") id: number, @Body("password") password: string) {
     return this.boardService.deletePost(+id, password);
   }
 
