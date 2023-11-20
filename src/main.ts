@@ -10,10 +10,9 @@ async function bootstrap() {
   let httpsOptions;
   if (ssl) {
     httpsOptions = {
+      host: "0.0.0.0",
       key: readFileSync(process.env.SSL_KEY_PATH!),
       cert: readFileSync(process.env.SSL_CERT_PATH!),
-      host: "152.69.230.5:9999",
-      port: 9999,
     };
   }
 
